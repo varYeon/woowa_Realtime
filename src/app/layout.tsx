@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="flex justify-center items-center min-h-screen bg-gradient-to-t from-[#0D1A4A] to-[#5468A8]">
-        <div className="h-180 w-100 bg-white rounded-2xl shadow-2xl opacity-30">
+        <div className="h-180 w-100 bg-white/30 rounded-2xl shadow-2xl relative">
           <Headers />
           {children}
           <Nav />
