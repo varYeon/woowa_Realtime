@@ -1,7 +1,11 @@
+import ChatRoomsClient from "@/components/ChatRoomsClient";
+import SearchBar from "@/components/SearchBar";
+
 export default function RoomsPage() {
   return (
     <>
-      <h1>RoomsPage</h1>
+      <SearchBar />
+      <ChatRoomsClient />
     </>
   );
 }
