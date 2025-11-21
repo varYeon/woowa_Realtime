@@ -1,7 +1,5 @@
+import Message from "@/components/messages/Message";
+
 export default function MessagePage() {
-  return (
-    <>
-      <h1>MessagePage</h1>
-    </>
-  );
+  return <Message />;
 }
