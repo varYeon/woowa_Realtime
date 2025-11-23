@@ -2,9 +2,11 @@
 
 import { formattedRoom } from "@/utils/formatDate";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function ChatRoomsClient() {
+  const router = useRouter();
   const [rooms, setRooms] = useState<any[]>([]);
   // [ { id: 1, name: "...", created_at: "..."}, ... ]
   // 두 번째 useEffect 이후에 :: [ { id: 1, name: "...", created_at: "...", content: "..."}, ... ]
@@ -65,12 +67,17 @@ export default function ChatRoomsClient() {
     fetchLastComment();
   }, [rooms]);
 
+  const handleClick = (id: string) => {
+    router.push(`/rooms/${id}`);
+  };
+
   return (
     <div className="flex flex-col gap-2">
       {rooms.map((room) => (
         <div
           key={room.id}
           className="cursor-pointer hover:bg-gray-400 rounded-xl p-3 flex flex-col gap-3"
+          onClick={() => handleClick(room.id)}
         >
           <div className="flex justify-between">
             <span>{room.name}</span>
