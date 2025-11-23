@@ -1,5 +1,6 @@
 "use client";
 
+import { formattedRoom } from "@/utils/formatDate";
 import { createClient } from "@/utils/supabase/client";
 import { useState, useEffect } from "react";
 
@@ -73,7 +74,7 @@ export default function ChatRoomsClient() {
         >
           <div className="flex justify-between">
             <span>{room.name}</span>
-            <span>{room.created_at}</span>
+            <span>{formattedRoom(room.created_at)}</span>
           </div>
           <div className="flex justify-between">
             <p className="w-full truncate">
