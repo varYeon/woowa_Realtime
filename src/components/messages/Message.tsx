@@ -13,13 +13,13 @@ export default function Message() {
   };
 
   return (
-    <>
+    <div className="relative">
       <div className="flex gap-3 p-2" onClick={backHandler}>
         <ChevronLeft className="cursor-pointer" />
         <span className="text-shadow-xs">nickname</span>
       </div>
       <MessageBubble />
       <MessageBar />
-    </>
+    </div>
   );
 }
