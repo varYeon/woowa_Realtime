@@ -1,4 +1,4 @@
-import ChatRoomsClient from "@/components/ChatRoomsClient";
+import ChatRoomsClient from "@/components/rooms/ChatRoomsClient";
 import SearchBar from "@/components/SearchBar";
 
 export default function RoomsPage() {
