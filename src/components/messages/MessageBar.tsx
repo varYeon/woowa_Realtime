@@ -19,14 +19,28 @@ export default function MessageBar({
 
     const supabase = createClient();
 
-    await supabase.from("messages").insert([
-      {
-        room_id: roomId,
-        sender: localStorage.getItem("sender") ?? "",
-        receiver: receiver ?? "",
-        content: message,
-      },
-    ]);
+    // realtime
+    const payload = {
+      room_id: roomId,
+      sender: localStorage.getItem("sender") ?? "",
+      receiver: receiver ?? "",
+      content: message,
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("messages").insert([payload]);
+
+    if (error) {
+      console.error("Insert error:", error.message);
+      return;
+    }
+
+    const channel = supabase.channel(`room:${roomId}`);
+    channel.send({
+      type: "broadcast",
+      event: "new_message",
+      payload: payload,
+    });
 
     setMessage("");
   };
