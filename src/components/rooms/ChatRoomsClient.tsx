@@ -65,7 +65,16 @@ export default function ChatRoomsClient() {
   }, [rooms]);
 
   const handleClick = (id: string) => {
-    router.push(`/rooms/${id}`);
+    const nickname = localStorage.getItem("sender");
+
+    if (!nickname) {
+      alert("닉네임 'woowa'를 먼저 입력해주세요!");
+      router.push("/users");
+    }
+
+    if (nickname) {
+      router.push(`/rooms/${id}`);
+    }
   };
 
   return (
