@@ -66,12 +66,13 @@ export default function MessageBubble({
         const isMine = message.sender === nickname;
 
         return (
-          <>
+          <div key={message.id}>
             {/* notMine */}
             {!isMine && (
               <>
                 <span className="text-sm ml-1.5">{message.sender}</span>
-                <div key={message.id} className={bubbleClass}>
+                {/* receiver 아님 */}
+                <div className={bubbleClass}>
                   <p
                     className={`${contentClass} bg-indigo-900/40 rounded-r-xl`}
                   >
@@ -98,7 +99,7 @@ export default function MessageBubble({
                 </p>
               </div>
             )}
-          </>
+          </div>
         );
       })}
     </>
