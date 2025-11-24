@@ -21,24 +21,19 @@ export default function ChatRoomsClient() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (roomError) {
-        console.error("Data error:", roomError.message);
-        return null;
+      if (roomError || !roomData) {
+        console.error("Room fetch error:", roomError?.message);
+        return;
       }
 
       const updatedRooms = await Promise.all(
-        rooms.map(async (room) => {
-          const { data: comment, error } = await supabase
+        roomData.map(async (room) => {
+          const { data: comment } = await supabase
             .from("messages")
             .select("content, created_at")
             .eq("room_id", room.id)
             .order("created_at", { ascending: false })
             .limit(1);
-
-          if (error) {
-            console.error("Data error:", error.message);
-            return room;
-          }
 
           return {
             ...room,
@@ -49,9 +44,6 @@ export default function ChatRoomsClient() {
       );
 
       setRooms(updatedRooms);
-
-      if (!roomError) setRooms(roomData ?? []);
-      // 이후의 map의 에러를 방지하기 위해 데이터가 없을 때 null을 빈배열로 교체
     };
 
     fetchRooms();
@@ -65,9 +57,7 @@ export default function ChatRoomsClient() {
       router.push("/users");
     }
 
-    if (nickname) {
-      router.push(`/rooms/${id}`);
-    }
+    if (nickname) router.push(`/rooms/${id}`);
   };
 
   return (
