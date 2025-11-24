@@ -1,5 +1,3 @@
-// supabase db type 자동 생성
-
 export type Json =
   | string
   | number
@@ -21,26 +19,29 @@ export type Database = {
           content: string;
           created_at: string;
           id: string;
-          nickname: string;
+          receiver: string;
           room_id: string;
+          sender: string;
         };
         Insert: {
           content: string;
           created_at?: string;
           id?: string;
-          nickname: string;
+          receiver: string;
           room_id: string;
+          sender: string;
         };
         Update: {
           content?: string;
           created_at?: string;
           id?: string;
-          nickname?: string;
+          receiver?: string;
           room_id?: string;
+          sender?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "messages_rood_id_fkey";
+            foreignKeyName: "messages_room_id_fkey";
             columns: ["room_id"];
             isOneToOne: false;
             referencedRelation: "posts";

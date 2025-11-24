@@ -1,60 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { Message } from "@/types/Message";
+import { formattedMessage } from "@/utils/formatDate";
+import { createClient } from "@/utils/supabase/client";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function MessageBubble() {
-  const [isMine, setIsMine] = useState(true);
-  const dummyMessage: Message[] = [
-    {
-      id: 1,
-      nickname: "kim",
-      content: "자니..?",
-      created: "11:22",
-      roomId: 1,
-    },
-    {
-      id: 1,
-      nickname: "kim",
-      content: "보고싶다...",
-      created: "11:23",
-      roomId: 1,
-    },
-    {
-      id: 2,
-      nickname: "me",
-      content:
-        "뭐야 꺼져요 요르르르를를ㄹㄹㄹㄹㄹㄹㄹ를르르ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ르ㅡㅡ르르르르르르",
-      created: "12:04",
-      roomId: 1,
-    },
-  ];
+export default function MessageBubble({
+  roomId,
+  receiver,
+}: {
+  roomId: string;
+  receiver: string;
+}) {
+  const router = useRouter();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [nickname, setNickname] = useState<string | null>(null);
 
   const bubbleClass = "flex gap-2 m-2 justify-start items-end";
   const timeClass = "text-sm text-gray-700 whitespace-nowrap";
-  const contentClass = `${
-    isMine ? "bg-indigo-900/40" : "bg-white/40"
-  } max-w-2/3 min-h-10 rounded-b-xl rounded-l-xl p-2 text-sm break-words shadow-xl`;
+  const contentClass =
+    "max-w-2/3 min-h-10 rounded-b-xl p-2 text-sm break-words shadow-xl";
+
+  const backHandler = () => {
+    router.push("/rooms");
+  };
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Data error:", error.message);
+        return null;
+      }
+
+      if (!error) setMessages(data ?? []);
+      // console.log(data); // 담겼는데
+      // console.log(messages); // 안 담겼다 : set이 적용되는 시점은 다음 렌더링
+    };
+
+    fetchMessages();
+  }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sender");
+    setNickname(stored);
+  }, []);
 
   return (
     <>
-      {/* notMine */}
-      {!isMine && (
-        <div key={dummyMessage[0].id} className={bubbleClass}>
-          <p className={contentClass}>{dummyMessage[0].content}</p>
-          <span className={timeClass}>{dummyMessage[0].created}</span>
-        </div>
-      )}
+      {/* Header */}
+      <div className="flex gap-3 p-2" onClick={backHandler}>
+        <ChevronLeft className="cursor-pointer" />
+        <span className="text-shadow-xs">{receiver}</span>
+      </div>
 
-      {/* isMine */}
-      {isMine && (
-        <div
-          key={dummyMessage[2].id}
-          className="flex gap-2 m-2 justify-end items-end"
-        >
-          <span className={timeClass}>{dummyMessage[2].created}</span>
-          <p className={contentClass}>{dummyMessage[2].content}</p>
-        </div>
-      )}
+      {messages.map((message) => {
+        const isMine = message.sender === nickname;
+
+        return (
+          <div key={message.id}>
+            {/* notMine */}
+            {!isMine && (
+              <>
+                <span className="text-sm ml-1.5">{message.sender}</span>
+                {/* receiver 아님 */}
+                <div className={bubbleClass}>
+                  <p
+                    className={`${contentClass} bg-indigo-900/40 rounded-r-xl`}
+                  >
+                    {message.content}
+                  </p>
+                  <span className={timeClass}>
+                    {formattedMessage(message.created_at)}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {/* isMine */}
+            {isMine && (
+              <div
+                key={message.id}
+                className="flex gap-2 m-2 justify-end items-end"
+              >
+                <span className={timeClass}>
+                  {formattedMessage(message.created_at)}
+                </span>
+                <p className={`${contentClass} bg-white/40 rounded-l-xl`}>
+                  {message.content}
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 }

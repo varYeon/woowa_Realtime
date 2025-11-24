@@ -1,14 +1,20 @@
 "use client";
 
 import { Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function NicknameInput() {
   const [nickname, setNickname] = useState("");
+  const router = useRouter();
 
-  const submitHandler = () => {
+  const submitHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!nickname.trim()) return alert("닉네임을 입력해주세요!");
-    localStorage.setItem("nickname", nickname);
+    localStorage.setItem("sender", nickname);
+
+    router.push("/rooms");
   };
 
   return (

@@ -1,25 +1,40 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import MessageBar from "./MessageBar";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Message() {
-  const router = useRouter();
+  const { roomId } = useParams() as { roomId: string };
+  const [receiver, setReceiver] = useState<string | null>(null);
 
-  const backHandler = () => {
-    router.push("/rooms");
-  };
+  useEffect(() => {
+    const fetchReceiver = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("name")
+        .eq("id", roomId)
+        .single();
+
+      if (!error && data) {
+        setReceiver(data.name);
+      }
+    };
+
+    fetchReceiver();
+  }, [roomId]);
 
   return (
-    <>
-      <div className="flex gap-3 p-2" onClick={backHandler}>
-        <ChevronLeft className="cursor-pointer" />
-        <span className="text-shadow-xs">nickname</span>
-      </div>
-      <MessageBubble />
-      <MessageBar />
-    </>
+    <div className="relative">
+      {receiver && (
+        <>
+          <MessageBubble roomId={roomId} receiver={receiver} />
+          <MessageBar roomId={roomId} receiver={receiver} />
+        </>
+      )}
+    </div>
   );
 }
