@@ -22,7 +22,7 @@ export default function MessageBubble({ roomId }: { roomId: string }) {
         .from("messages")
         .select("*")
         .eq("room_id", roomId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true });
 
       if (error) {
         console.error("Data error:", error.message);
