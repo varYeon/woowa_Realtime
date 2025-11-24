@@ -15,14 +15,13 @@ export default function MessageBubble({
   receiver: string;
 }) {
   const router = useRouter();
-  const [isMine, setIsMine] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [nickname, setNickname] = useState<string | null>(null);
 
   const bubbleClass = "flex gap-2 m-2 justify-start items-end";
   const timeClass = "text-sm text-gray-700 whitespace-nowrap";
-  const contentClass = `${
-    isMine ? "bg-indigo-900/40" : "bg-white/40"
-  } max-w-2/3 min-h-10 rounded-b-xl rounded-l-xl p-2 text-sm break-words shadow-xl`;
+  const contentClass =
+    "max-w-2/3 min-h-10 rounded-b-xl p-2 text-sm break-words shadow-xl";
 
   const backHandler = () => {
     router.push("/rooms");
@@ -50,40 +49,54 @@ export default function MessageBubble({
     fetchMessages();
   }, []);
 
+  useEffect(() => {
+    const stored = localStorage.getItem("sender");
+    setNickname(stored);
+  }, []);
+
   return (
     <>
+      {/* Header */}
       <div className="flex gap-3 p-2" onClick={backHandler}>
         <ChevronLeft className="cursor-pointer" />
         <span className="text-shadow-xs">{receiver}</span>
       </div>
 
-      {messages.map((message) => (
-        <>
-          {/* notMine */}
-          {!isMine && (
-            <div key={message.id} className={bubbleClass}>
-              <p className={contentClass}>{message.content}</p>
-              <span className={timeClass}>
-                {formattedMessage(message.created_at)}
-              </span>
-            </div>
-          )}
+      {messages.map((message) => {
+        const isMine = message.sender === nickname;
 
-          {/* isMine */}
-          {/* 닉네임 없다 */}
-          {isMine && (
-            <div
-              key={message.id}
-              className="flex gap-2 m-2 justify-end items-end"
-            >
-              <span className={timeClass}>
-                {formattedMessage(message.created_at)}
-              </span>
-              <p className={contentClass}>{message.content}</p>
-            </div>
-          )}
-        </>
-      ))}
+        return (
+          <>
+            {/* notMine */}
+            {!isMine && (
+              <div key={message.id} className={bubbleClass}>
+                <p className={`${contentClass} bg-indigo-900/40 rounded-r-xl`}>
+                  {message.content}
+                </p>
+                <span className={timeClass}>
+                  {formattedMessage(message.created_at)}
+                </span>
+              </div>
+            )}
+
+            {/* isMine */}
+            {/* 닉네임 없다 */}
+            {isMine && (
+              <div
+                key={message.id}
+                className="flex gap-2 m-2 justify-end items-end"
+              >
+                <span className={timeClass}>
+                  {formattedMessage(message.created_at)}
+                </span>
+                <p className={`${contentClass} bg-white/40 rounded-l-xl`}>
+                  {message.content}
+                </p>
+              </div>
+            )}
+          </>
+        );
+      })}
     </>
   );
 }

@@ -1,5 +1,4 @@
 "use client";
-
 import { createClient } from "@/utils/supabase/client";
 import { Send } from "lucide-react";
 import { useState } from "react";
@@ -34,7 +33,7 @@ export default function MessageBar({
 
   return (
     <form
-      className="flex fixed bottom-25 w-96 p-5 mx-2 rounded-xl bg-white/40 shadow-xl h-2 items-center"
+      className="flex fixed bottom-55 w-96 p-5 mx-2 rounded-xl bg-white/40 shadow-xl h-2 items-center"
       onSubmit={messageHandler}
     >
       <input
