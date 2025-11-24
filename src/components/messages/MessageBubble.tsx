@@ -1,33 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Message } from "@/types/Message";
+import { formattedMessage } from "@/utils/formatDate";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
-export default function MessageBubble() {
+export default function MessageBubble({ roomId }: { roomId: string }) {
   const [isMine, setIsMine] = useState(true);
-  const dummyMessage: Message[] = [
-    {
-      id: 1,
-      nickname: "kim",
-      content: "자니..?",
-      created: "11:22",
-      roomId: 1,
-    },
-    {
-      id: 1,
-      nickname: "kim",
-      content: "보고싶다...",
-      created: "11:23",
-      roomId: 1,
-    },
-    {
-      id: 2,
-      nickname: "me",
-      content:
-        "뭐야 꺼져요 요르르르를를ㄹㄹㄹㄹㄹㄹㄹ를르르ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ르ㅡㅡ르르르르르르",
-      created: "12:04",
-      roomId: 1,
-    },
-  ];
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const bubbleClass = "flex gap-2 m-2 justify-start items-end";
   const timeClass = "text-sm text-gray-700 whitespace-nowrap";
@@ -35,26 +15,57 @@ export default function MessageBubble() {
     isMine ? "bg-indigo-900/40" : "bg-white/40"
   } max-w-2/3 min-h-10 rounded-b-xl rounded-l-xl p-2 text-sm break-words shadow-xl`;
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Data error:", error.message);
+        return null;
+      }
+
+      if (!error) setMessages(data ?? []);
+      console.log(data); // 담겼는데
+      console.log(messages); // 안 담겼다 : set이 적용되는 시점은 다음 렌더링
+    };
+
+    fetchMessages();
+  }, []);
+
   return (
     <>
-      {/* notMine */}
-      {!isMine && (
-        <div key={dummyMessage[0].id} className={bubbleClass}>
-          <p className={contentClass}>{dummyMessage[0].content}</p>
-          <span className={timeClass}>{dummyMessage[0].created}</span>
-        </div>
-      )}
+      {messages.map((message) => (
+        <>
+          {/* notMine */}
+          {!isMine && (
+            <div key={message.id} className={bubbleClass}>
+              <p className={contentClass}>{message.content}</p>
+              <span className={timeClass}>
+                {formattedMessage(message.created_at)}
+              </span>
+            </div>
+          )}
 
-      {/* isMine */}
-      {isMine && (
-        <div
-          key={dummyMessage[2].id}
-          className="flex gap-2 m-2 justify-end items-end"
-        >
-          <span className={timeClass}>{dummyMessage[2].created}</span>
-          <p className={contentClass}>{dummyMessage[2].content}</p>
-        </div>
-      )}
+          {/* isMine */}
+          {/* 닉네임 없다 */}
+          {isMine && (
+            <div
+              key={message.id}
+              className="flex gap-2 m-2 justify-end items-end"
+            >
+              <span className={timeClass}>
+                {formattedMessage(message.created_at)}
+              </span>
+              <p className={contentClass}>{message.content}</p>
+            </div>
+          )}
+        </>
+      ))}
     </>
   );
 }

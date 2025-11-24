@@ -3,9 +3,8 @@ import { Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
-export default function MessageBar() {
+export default function MessageBar({ roomId }: { roomId: string }) {
   const [message, setMessage] = useState("");
-  const { roomId } = useParams() as { roomId: string };
 
   const messageHandler = async (e: React.FormEvent) => {
     e.preventDefault();

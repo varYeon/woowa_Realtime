@@ -1,5 +1,6 @@
 "use client";
 
+import { Room } from "@/types/rooms";
 import { formattedRoom } from "@/utils/formatDate";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -7,7 +8,7 @@ import { useState, useEffect } from "react";
 
 export default function ChatRoomsClient() {
   const router = useRouter();
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   // [ { id: 1, name: "...", created_at: "..."}, ... ]
   // 두 번째 useEffect 이후에 :: [ { id: 1, name: "...", created_at: "...", content: "..."}, ... ]
 
@@ -19,10 +20,6 @@ export default function ChatRoomsClient() {
         .from("posts")
         .select("*")
         .order("created_at", { ascending: false });
-
-      console.log("data:", room);
-      console.log("error:", error);
-      console.log("rooms state:", rooms);
 
       if (error) {
         console.error("Data error:", error.message);

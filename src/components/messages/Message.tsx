@@ -3,10 +3,11 @@
 import { ChevronLeft } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import MessageBar from "./MessageBar";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function Message() {
   const router = useRouter();
+  const { roomId } = useParams() as { roomId: string };
 
   const backHandler = () => {
     router.push("/rooms");
@@ -18,8 +19,8 @@ export default function Message() {
         <ChevronLeft className="cursor-pointer" />
         <span className="text-shadow-xs">nickname</span>
       </div>
-      <MessageBubble />
-      <MessageBar />
+      <MessageBubble roomId={roomId} />
+      <MessageBar roomId={roomId} />
     </div>
   );
 }
