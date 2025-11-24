@@ -44,17 +44,25 @@ export default function ChatRoomsClient() {
         rooms.map(async (room) => {
           const { data: comment, error } = await supabase
             .from("messages")
-            .select("content")
+            .select("content, created_at")
             .eq("room_id", room.id)
             .order("created_at", { ascending: false })
             .limit(1);
+
+          console.log("room.id:", room.id);
+          console.log("comments returned:", comment);
+          console.log("error:", error);
 
           if (error) {
             console.error("Data error:", error.message);
             return room;
           }
 
-          return { ...room, comment: comment?.[0] ?? null };
+          return {
+            ...room,
+            lastMessage: comment?.[0]?.content ?? null,
+            lastMessageTime: comment?.[0]?.created_at ?? null,
+          };
         })
       );
 
@@ -87,11 +95,11 @@ export default function ChatRoomsClient() {
         >
           <div className="flex justify-between">
             <span>{room.name}</span>
-            <span>{formattedRoom(room.created_at)}</span>
+            <span>{formattedRoom(room.lastMessageTime)}</span>
           </div>
           <div className="flex justify-between">
             <p className="w-full truncate">
-              {room.content ?? "채팅을 시작해보세요"}
+              {room.lastMessage ?? "채팅을 시작해보세요"}
             </p>
             <div className="bg-orange-600 rounded-4xl h-5.5 w-6 flex flex-col justify-center items-center">
               1
