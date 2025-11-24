@@ -69,18 +69,22 @@ export default function MessageBubble({
           <>
             {/* notMine */}
             {!isMine && (
-              <div key={message.id} className={bubbleClass}>
-                <p className={`${contentClass} bg-indigo-900/40 rounded-r-xl`}>
-                  {message.content}
-                </p>
-                <span className={timeClass}>
-                  {formattedMessage(message.created_at)}
-                </span>
-              </div>
+              <>
+                <span className="text-sm ml-1.5">{message.sender}</span>
+                <div key={message.id} className={bubbleClass}>
+                  <p
+                    className={`${contentClass} bg-indigo-900/40 rounded-r-xl`}
+                  >
+                    {message.content}
+                  </p>
+                  <span className={timeClass}>
+                    {formattedMessage(message.created_at)}
+                  </span>
+                </div>
+              </>
             )}
 
             {/* isMine */}
-            {/* 닉네임 없다 */}
             {isMine && (
               <div
                 key={message.id}
