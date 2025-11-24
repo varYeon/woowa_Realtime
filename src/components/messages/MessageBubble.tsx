@@ -50,7 +50,7 @@ export default function MessageBubble({ roomId }: { roomId: string }) {
         <>
           <div className="flex gap-3 p-2" onClick={backHandler}>
             <ChevronLeft className="cursor-pointer" />
-            <span className="text-shadow-xs">{message.nickname}</span>
+            <span className="text-shadow-xs">{message.receiver}</span>
           </div>
           {/* notMine */}
           {!isMine && (

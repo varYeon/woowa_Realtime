@@ -8,7 +8,7 @@ export default function NicknameInput() {
 
   const submitHandler = () => {
     if (!nickname.trim()) return alert("닉네임을 입력해주세요!");
-    localStorage.setItem("nickname", nickname);
+    localStorage.setItem("sender", nickname);
   };
 
   return (

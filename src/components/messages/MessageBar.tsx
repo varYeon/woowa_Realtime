@@ -1,22 +1,40 @@
 import { createClient } from "@/utils/supabase/client";
 import { Send } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MessageBar({ roomId }: { roomId: string }) {
   const [message, setMessage] = useState("");
+  const [receiver, setReceiver] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchReceiver = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("name")
+        .eq("id", roomId)
+        .single();
+
+      if (!error && data) {
+        setReceiver(data.name);
+      }
+    };
+
+    fetchReceiver();
+  }, [roomId]);
 
   const messageHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!message.trim()) return;
 
-    const supabase = await createClient();
+    const supabase = createClient();
 
     await supabase.from("messages").insert([
       {
         room_id: roomId,
-        nickname: localStorage.getItem("nickname") ?? "",
+        sender: localStorage.getItem("sender") ?? "",
+        receiver: receiver ?? "",
         content: message,
       },
     ]);
