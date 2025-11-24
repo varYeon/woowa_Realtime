@@ -7,7 +7,13 @@ import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function MessageBubble({ roomId }: { roomId: string }) {
+export default function MessageBubble({
+  roomId,
+  receiver,
+}: {
+  roomId: string;
+  receiver: string;
+}) {
   const router = useRouter();
   const [isMine, setIsMine] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,8 +43,8 @@ export default function MessageBubble({ roomId }: { roomId: string }) {
       }
 
       if (!error) setMessages(data ?? []);
-      console.log(data); // 담겼는데
-      console.log(messages); // 안 담겼다 : set이 적용되는 시점은 다음 렌더링
+      // console.log(data); // 담겼는데
+      // console.log(messages); // 안 담겼다 : set이 적용되는 시점은 다음 렌더링
     };
 
     fetchMessages();
@@ -46,12 +52,13 @@ export default function MessageBubble({ roomId }: { roomId: string }) {
 
   return (
     <>
+      <div className="flex gap-3 p-2" onClick={backHandler}>
+        <ChevronLeft className="cursor-pointer" />
+        <span className="text-shadow-xs">{receiver}</span>
+      </div>
+
       {messages.map((message) => (
         <>
-          <div className="flex gap-3 p-2" onClick={backHandler}>
-            <ChevronLeft className="cursor-pointer" />
-            <span className="text-shadow-xs">{message.receiver}</span>
-          </div>
           {/* notMine */}
           {!isMine && (
             <div key={message.id} className={bubbleClass}>

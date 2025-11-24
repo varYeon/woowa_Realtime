@@ -15,7 +15,7 @@ export default function ChatRoomsClient() {
   // 처음 한 번만 실행
   useEffect(() => {
     const fetchRooms = async () => {
-      const supabase = await createClient();
+      const supabase = createClient();
       const { data: room, error } = await supabase
         .from("posts")
         .select("*")
