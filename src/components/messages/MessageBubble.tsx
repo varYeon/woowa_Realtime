@@ -49,6 +49,28 @@ export default function MessageBubble({
     fetchMessages();
   }, []);
 
+  // realtime
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase.channel(`room:${roomId}`, {
+      config: {
+        broadcast: {
+          self: true,
+        },
+      },
+    });
+
+    channel.on("broadcast", { event: "new_message" }, ({ payload }) => {
+      setMessages((prev) => [...prev, payload]);
+    });
+
+    channel.subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [roomId]);
+
   useEffect(() => {
     const stored = localStorage.getItem("sender");
     setNickname(stored);

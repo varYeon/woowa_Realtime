@@ -12,57 +12,42 @@ export default function ChatRoomsClient() {
   // [ { id: 1, name: "...", created_at: "..."}, ... ]
   // 두 번째 useEffect 이후에 :: [ { id: 1, name: "...", created_at: "...", content: "..."}, ... ]
 
-  // 처음 한 번만 실행
   useEffect(() => {
     const fetchRooms = async () => {
       const supabase = createClient();
-      const { data: room, error } = await supabase
+
+      const { data: roomData, error: roomError } = await supabase
         .from("posts")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Data error:", error.message);
-        return null;
+      if (roomError || !roomData) {
+        console.error("Room fetch error:", roomError?.message);
+        return;
       }
 
-      if (!error) setRooms(room ?? []);
-      // 이후의 map의 에러를 방지하기 위해 데이터가 없을 때 null을 빈배열로 교체
-    };
-
-    fetchRooms();
-  }, []);
-
-  // rooms가 준비되는 시점에 최신 메세지를 불러옴 (roomId가 필요하기 때문)
-  useEffect(() => {
-    if (rooms.length === 0) return;
-
-    const fetchLastComment = async () => {
-      const supabase = createClient();
-
       const updatedRooms = await Promise.all(
-        rooms.map(async (room) => {
-          const { data: comment, error } = await supabase
+        roomData.map(async (room) => {
+          const { data: comment } = await supabase
             .from("messages")
-            .select("content")
+            .select("content, created_at")
             .eq("room_id", room.id)
             .order("created_at", { ascending: false })
             .limit(1);
 
-          if (error) {
-            console.error("Data error:", error.message);
-            return room;
-          }
-
-          return { ...room, comment: comment?.[0] ?? null };
+          return {
+            ...room,
+            lastMessage: comment?.[0]?.content ?? null,
+            lastMessageTime: comment?.[0]?.created_at ?? null,
+          };
         })
       );
 
       setRooms(updatedRooms);
     };
 
-    fetchLastComment();
-  }, [rooms]);
+    fetchRooms();
+  }, []);
 
   const handleClick = (id: string) => {
     const nickname = localStorage.getItem("sender");
@@ -72,9 +57,7 @@ export default function ChatRoomsClient() {
       router.push("/users");
     }
 
-    if (nickname) {
-      router.push(`/rooms/${id}`);
-    }
+    if (nickname) router.push(`/rooms/${id}`);
   };
 
   return (
@@ -87,11 +70,11 @@ export default function ChatRoomsClient() {
         >
           <div className="flex justify-between">
             <span>{room.name}</span>
-            <span>{formattedRoom(room.created_at)}</span>
+            <span>{formattedRoom(room.lastMessageTime)}</span>
           </div>
           <div className="flex justify-between">
             <p className="w-full truncate">
-              {room.content ?? "채팅을 시작해보세요"}
+              {room.lastMessage ?? "채팅을 시작해보세요"}
             </p>
             <div className="bg-orange-600 rounded-4xl h-5.5 w-6 flex flex-col justify-center items-center">
               1
